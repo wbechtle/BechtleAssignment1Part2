@@ -11,6 +11,12 @@
  * Allows for search by name or age. 
  * Added small improvements to output formatting.
  */
+/*
+ * 11/3/2024
+ * Wyatt Bechtle
+ * Added update and delete functionality.
+ * Added small improvements to output formatting.
+ */
 
 import java.util.Scanner;
 
@@ -27,9 +33,11 @@ public class PetDatabase {
         System.out.print("\nWhat would you like to do?\n" + 
                         "1) View all pets\n" + 
                         "2) Add more pets\n" + 
-                        "3) Search pets by name\n" +  
-                        "4) Search pets by age\n" +
-                        "5) Exit program\n" +
+                        "3) Update an existing pet\n" +
+                        "4) Remove an existing pet\n" +
+                        "5) Search pets by name\n" +  
+                        "6) Search pets by age\n" +
+                        "7) Exit program\n" +
                         "\nYour choice:");
     }
     // Method used to append a pet to the petArray
@@ -152,6 +160,32 @@ public class PetDatabase {
         System.out.println("+----------------------+");
         System.out.printf("%d rows in set.\n", rows);
     }
+    // Method used to update an existing pet
+    public void updatePet(int index, String name, int age) {
+
+        Pet pet = this.petArray[index];
+        System.out.printf("\n%s %d changed to %s %d.\n", pet.getName(), pet.getAge(), name, age);
+        pet.setAge(age);
+        pet.setName(name);
+    }
+    // Method used to delete an existing pet
+    public void deletePet(int index) {
+
+        String nameToDelete = this.petArray[index].getName();
+        int ageToDelete = this.petArray[index].getAge();
+
+         // Shift elements to the left, starting from the index
+        for (int i = index; i < this.petsInArray - 1; i++) {
+            this.petArray[i] = this.petArray[i + 1];
+        }
+        // Set the last element to null after shifting
+        this.petArray[this.petsInArray - 1] = null;
+
+        // Update the count of pets
+        this.petsInArray--;
+
+        System.out.printf("\n%s %d succesfully deleted.\n", nameToDelete, ageToDelete);
+    }
     public static void main(String[] args) {
 
         // Instantiate a new PetDatabase object
@@ -193,8 +227,36 @@ public class PetDatabase {
                     myPetDatabase.addPets();
                     break;
 
-                // User select to search pets by name
+                // User select to update an existing pet
                 case "3":
+                    myPetDatabase.displayAllPets();
+
+                    // Prompt user for input
+                    System.out.print("\nEnter the pet ID you want to update: ");
+                    int index = myScanner.nextInt();
+                    System.out.print("\nEnter new name and age: ");
+                    String newName = myScanner.next();
+                    int newAge = myScanner.nextInt();
+                    myScanner.nextLine();
+
+                    // Call updatePet method
+                    myPetDatabase.updatePet(index, newName, newAge);
+                    break;
+
+                // User select to remove an existing pet
+                case "4":
+                    myPetDatabase.displayAllPets();
+
+                    // Prompt user for input
+                    System.out.print("\nEnter the pet ID you want to delete: ");
+                    int indexToDelete = myScanner.nextInt();
+                    myScanner.nextLine();
+                    myPetDatabase.deletePet(indexToDelete);
+
+                    break;
+
+                // User select to search pets by name
+                case "5":
                     System.out.print("\nEnter a name to search: ");
                     String name = myScanner.next();
                     myScanner.nextLine();
@@ -202,7 +264,7 @@ public class PetDatabase {
                     break;
 
                 // User select to search pets by age
-                case "4":
+                case "6":
                     System.out.print("\nEnter an age to search: ");
                     int age = myScanner.nextInt();
                     myScanner.nextLine();
@@ -210,7 +272,7 @@ public class PetDatabase {
                     break;
 
                 // User selects to exit database
-                case "5":
+                case "7":
 
                     System.out.println("\nGood-Bye...");
                     goAgain = false;
