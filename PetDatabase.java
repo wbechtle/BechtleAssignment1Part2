@@ -3,6 +3,14 @@
 // L00483047
 // bechtlew@csp.edu
 // Initial start data: 10/31/24
+// Revisions and Notes
+/*
+ * 11/2/2024
+ * Wyatt Bechtle
+ * Added searching feature to pet database. 
+ * Allows for search by name or age. 
+ * Added small improvements to output formatting.
+ */
 
 import java.util.Scanner;
 
@@ -16,11 +24,13 @@ public class PetDatabase {
     // Method used to display menu
     public void displayMenu() {
 
-        System.out.print("What would you like to do?\n" + 
+        System.out.print("\nWhat would you like to do?\n" + 
                         "1) View all pets\n" + 
                         "2) Add more pets\n" + 
-                        "3) Exit program\n" +
-                        "Your choice:");
+                        "3) Search pets by name\n" +  
+                        "4) Search pets by age\n" +
+                        "5) Exit program\n" +
+                        "\nYour choice:");
     }
     // Method used to append a pet to the petArray
     public void appendPet(Pet pet) {
@@ -60,7 +70,7 @@ public class PetDatabase {
         while (goAgain) {
 
             // Prompt user for input
-            System.out.print("add pet (name, age): ");
+            System.out.print("\nadd pet (name, age): ");
 
             // Extract name
             String petName = myScanner.next();
@@ -87,7 +97,7 @@ public class PetDatabase {
     public void displayAllPets() {
 
         // Display column titles
-        System.out.println("+----------------------+\n" +
+        System.out.println("\n+----------------------+\n" +
                            "| ID | NAME      | AGE |\n" +
                            "+----------------------+");
         // Display rows one at a time
@@ -97,6 +107,50 @@ public class PetDatabase {
         // Display footer and row count
         System.out.println("+----------------------+");
         System.out.printf("%d rows in set.\n", this.petsInArray);
+    }
+    // Method used to search pets by name
+    public void searchPetsByName(String name) {
+
+        // Display column titles
+        System.out.println("\n+----------------------+\n" +
+                           "| ID | NAME      | AGE |\n" +
+                           "+----------------------+");
+        // Create a count
+        int rows = 0;
+        // Display rows one at a time
+        for (int i = 0; i < this.petsInArray; i++) {
+
+            // If name matches, display row
+            if (name.equalsIgnoreCase(this.petArray[i].getName())) {
+                System.out.printf("|%3d | %-10s|%4d |\n", i, this.petArray[i].getName(), this.petArray[i].getAge());
+                rows += 1;
+            }
+        } 
+        // Display footer and row count
+        System.out.println("+----------------------+");
+        System.out.printf("%d rows in set.\n", rows);
+    }
+    // Method used to search pets by age
+    public void searchPetsByAge(int age) {
+
+        // Display column titles
+        System.out.println("\n+----------------------+\n" +
+                           "| ID | NAME      | AGE |\n" +
+                           "+----------------------+");
+        // Create a count
+        int rows = 0;
+        // Display rows one at a time
+        for (int i = 0; i < this.petsInArray; i++) {
+
+            // If age matches, display row
+            if (age == this.petArray[i].getAge()) {
+                System.out.printf("|%3d | %-10s|%4d |\n", i, this.petArray[i].getName(), this.petArray[i].getAge());
+                rows += 1;
+            }
+        } 
+        // Display footer and row count
+        System.out.println("+----------------------+");
+        System.out.printf("%d rows in set.\n", rows);
     }
     public static void main(String[] args) {
 
@@ -139,15 +193,32 @@ public class PetDatabase {
                     myPetDatabase.addPets();
                     break;
 
-                // User selects to exit database
+                // User select to search pets by name
                 case "3":
+                    System.out.print("\nEnter a name to search: ");
+                    String name = myScanner.next();
+                    myScanner.nextLine();
+                    myPetDatabase.searchPetsByName(name);
+                    break;
 
+                // User select to search pets by age
+                case "4":
+                    System.out.print("\nEnter an age to search: ");
+                    int age = myScanner.nextInt();
+                    myScanner.nextLine();
+                    myPetDatabase.searchPetsByAge(age);
+                    break;
+
+                // User selects to exit database
+                case "5":
+
+                    System.out.println("\nGood-Bye...");
                     goAgain = false;
                     break;
             
                 default:
 
-                    System.out.println("Error: invalid input. Please enter 1-3");
+                    System.out.println("\nError: invalid input. Please enter 1-5");
                     break;
             }
         } while (goAgain);
