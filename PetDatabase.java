@@ -31,7 +31,7 @@ import java.io.Serializable;
 public class PetDatabase implements Serializable {
 
     // Attributes
-    private int petArrayCapacity = 20;
+    private int petArrayCapacity = 5;
     private Pet[] petArray = new Pet[petArrayCapacity];
     private int petsInArray = 0;
 
@@ -49,29 +49,25 @@ public class PetDatabase implements Serializable {
                         "\nYour choice:");
     }
     // Method used to append a pet to the petArray
-    public void appendPet(Pet pet) {
+    public boolean appendPet(Pet pet) {
 
-        // If petArray at max capacity, double the size
+        // If petArray at max capacity
         if (this.petsInArray == petArray.length) {
+            System.out.println("\nERROR: Database is full.");
 
-            // Create temp array of double size
-            Pet[] tempArray = new Pet[this.petArrayCapacity * 2];
-
-            // Update capacity
-            this.petArrayCapacity *= 2;
-
-            // Copy elements of array
-            for (int i = 0; i < this.petArray.length; i++) {
-                tempArray[i] = this.petArray[i];
-            }
-            // Update petArray reference to tempArray address
-            this.petArray = tempArray;
+            // Unsuccessful
+            return false;
         }
-        // Add pet to array
-        this.petArray[petsInArray] = pet;
+        else {
+            // Add pet to array
+            this.petArray[petsInArray] = pet;
 
-        // Increment petInArray
-        this.petsInArray += 1;
+            // Increment petInArray
+            this.petsInArray += 1;
+
+            // Successful
+            return true;
+        }
     }
     // Method used to add Pet objects to the PetDatabase
     public void addPets() {
@@ -85,27 +81,58 @@ public class PetDatabase implements Serializable {
         // While goAgain prompt user for pet data
         while (goAgain) {
 
-            // Prompt user for input
-            System.out.print("\nadd pet (name, age): ");
+            // Flag for user input validation
+            boolean invalid = true;
 
-            // Extract name
-            String petName = myScanner.next();
+            // Input validation loop
+            while (invalid) {
+                
+                // Prompt user for input
+                System.out.print("\nadd pet (name, age): ");
 
-            // If user does not enter done, finish extracting data, create a new object, and 
-            // append it to the petArray
-            if (!petName.equalsIgnoreCase("done")) {
+                // Extract line
+                String line = myScanner.nextLine();
 
-                // Extract age
-                int petAge = myScanner.nextInt();
+                // Extract strings
+                String[] strings = line.split(" ");
 
-                // Extract user input and instantiate a Pet object.
-                Pet pet = new Pet(petName, petAge);
+                // Check for exit condition
+                if (line.equalsIgnoreCase("done") || strings[0].equalsIgnoreCase("done")) {
 
-                // Call appendPet
-                appendPet(pet);
-            }
-            else {
-                goAgain = false;
+                    goAgain = false;
+                    invalid = false;
+                }
+                else {
+                    // Validate input
+                    invalid = !InputValidator.validateNameAgeEntry(line);
+                }
+                // If invalid, display message
+                if (invalid) {
+                    System.out.printf("\nError: %s is not a valid input.\n", line);
+                }
+                else if (goAgain) {
+
+                    // Extract name
+                    String petName = strings[0];
+
+                    // Extract age
+                    int petAge = Integer.valueOf(strings[1]);
+
+                    // If valid age is true continue adding Pet
+                    if (InputValidator.validateAge(petAge)) {
+
+                        // Instantiate a Pet object
+                        Pet pet = new Pet(petName, petAge);
+
+                        // Call appendPet
+                        goAgain = appendPet(pet);
+                    }
+                    else {
+                        // If invalid, display message and flip associated flags
+                        System.out.printf("\nError: %d is not a valid age.\n", petAge);
+                        invalid = true;
+                    }
+                }
             }
         }
     }
@@ -169,12 +196,75 @@ public class PetDatabase implements Serializable {
         System.out.printf("%d rows in set.\n", rows);
     }
     // Method used to update an existing pet
-    public void updatePet(int index, String name, int age) {
+    public void updatePet(PetDatabase myPetDatabase) {
 
-        Pet pet = this.petArray[index];
-        System.out.printf("\n%s %d changed to %s %d.\n", pet.getName(), pet.getAge(), name, age);
-        pet.setAge(age);
-        pet.setName(name);
+        // Scanner object for input extraction
+        Scanner myScanner = new Scanner(System.in);
+        
+        // Flag for user input validation
+        boolean invalid = true;
+
+        // Input validation loop
+        while (invalid) {
+
+            myPetDatabase.displayAllPets();
+                
+            // Prompt user for input
+            System.out.print("\nEnter the pet ID you want to update: ");
+
+            // Extract ID
+            String index = myScanner.nextLine();
+
+            // Validate ID
+            invalid = !InputValidator.validateIndex(index, myPetDatabase.petsInArray);
+
+            // If invalid, display message
+            if (invalid) {
+                System.out.printf("\nError: %s is not a valid index.\n", index);
+            }
+            else {
+
+                // Prompt user for input
+                System.out.print("\nEnter new name and age: ");
+
+                // Extract line
+                String line = myScanner.nextLine();
+
+                // Extract strings
+                String[] strings = line.split(" ");
+
+                // Validate input
+                invalid = !InputValidator.validateNameAgeEntry(line);
+
+                // If invalid, display message
+                if (invalid) {
+                    System.out.printf("\nError: %s is not a valid input.\n", line);
+                }
+                else {
+
+                    // Extract name
+                    String petName = strings[0];
+
+                    // Extract age
+                    int petAge = Integer.valueOf(strings[1]);
+
+                    // If valid age is valid continue updating Pet
+                    if (InputValidator.validateAge(petAge)) {
+
+                        Pet pet = this.petArray[Integer.valueOf(index)];
+                        System.out.printf("\n%s %d changed to %s %d.\n", pet.getName(), pet.getAge(), petName, petAge);
+                        pet.setAge(petAge);
+                        pet.setName(petName);
+                        invalid = false;
+                    }
+                    else {
+                        // If invalid, display message and flip associated flags
+                        System.out.printf("\nError: %d is not a valid age.\n", petAge);
+                        invalid = true;
+                    }
+                }
+            }    
+        }
     }
     // Method used to delete an existing pet
     public void deletePet(int index) {
@@ -239,18 +329,8 @@ public class PetDatabase implements Serializable {
 
                 // User select to update an existing pet
                 case "3":
-                    myPetDatabase.displayAllPets();
-
-                    // Prompt user for input
-                    System.out.print("\nEnter the pet ID you want to update: ");
-                    int index = myScanner.nextInt();
-                    System.out.print("\nEnter new name and age: ");
-                    String newName = myScanner.next();
-                    int newAge = myScanner.nextInt();
-                    myScanner.nextLine();
-
                     // Call updatePet method
-                    myPetDatabase.updatePet(index, newName, newAge);
+                    myPetDatabase.updatePet(myPetDatabase);
                     break;
 
                 // User select to remove an existing pet
@@ -291,7 +371,7 @@ public class PetDatabase implements Serializable {
             
                 default:
 
-                    System.out.println("\nError: invalid input. Please enter 1-5");
+                    System.out.println("\nError: invalid input. Please enter 1-7");
                     break;
             }
         } while (goAgain);
