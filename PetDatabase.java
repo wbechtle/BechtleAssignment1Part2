@@ -17,10 +17,18 @@
  * Added update and delete functionality.
  * Added small improvements to output formatting.
  */
+/*
+ * 11/7/2024
+ * Wyatt Bechtle
+ * Implemented Serializable class to allow for saving the PetDatabase.
+ * Added code to support loading a saved data file.
+ * Added code to support saving the PetDatabase to a file.
+ */
 
 import java.util.Scanner;
+import java.io.Serializable;
 
-public class PetDatabase {
+public class PetDatabase implements Serializable {
 
     // Attributes
     private int petArrayCapacity = 20;
@@ -188,8 +196,9 @@ public class PetDatabase {
     }
     public static void main(String[] args) {
 
-        // Instantiate a new PetDatabase object
-        PetDatabase myPetDatabase = new PetDatabase();
+        // If no data file, FileManager returns a new PetDatabase
+        // Otherwise, it returns the saved PetDatabase
+        PetDatabase myPetDatabase = FileManager.load();
 
         // Create scanner object for extracting user input
         Scanner myScanner = new Scanner(System.in);
@@ -198,13 +207,14 @@ public class PetDatabase {
         boolean goAgain = true;
 
         // For testing purposes
+        /*
         String[] petNames = new String[] {"Kitty", "Bruno", "Boomer", "Boomer", "Fiesty"};
         int[] petAges = new int[] {8, 7, 8, 3, 3};
         for (int i = 0; i < petNames.length; i++) {
             myPetDatabase.petArray[i] = new Pet(petNames[i], petAges[i]);
             myPetDatabase.petsInArray += 1;
         }
-
+        */
         // Iterates the program until user select quit option
         do {
             // Display menu
@@ -274,6 +284,7 @@ public class PetDatabase {
                 // User selects to exit database
                 case "7":
 
+                    FileManager.save(myPetDatabase);
                     System.out.println("\nGood-Bye...");
                     goAgain = false;
                     break;

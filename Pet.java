@@ -7,7 +7,14 @@
  * Added setters to the Pet class.
  * The setters allow for Pets to be updated in the PetDatabase.
  */
-public class Pet {
+/*
+ * 11/7/2024
+ * Wyatt Bechtle
+ * Implemented Serializable class to allow for Pet objects to be save to a file.
+ */
+import java.io.Serializable;
+
+public class Pet implements Serializable {
 
     // Attributes
     private String name;
